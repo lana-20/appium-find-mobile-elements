@@ -20,4 +20,30 @@ The third basic locator strategy is the 'class name' strategy. It basically allo
 
 The last basic strategy is the 'id' strategy. This one is a bit tricky. It exists primarily for use on the Android platform, because Android elements can be associated with something called an Android ID. This is an internal-only identifier used to refer to elements, though there is no requirement that the ID be unique. Still, Android IDs are a common way for Android developers to refer internally to elements, and Appium allows you to find them using this strategy. But what if you use this strategy on iOS? Well, on iOS this strategy will just do the same thing that the Accessibility ID strategy does--it will look for elements by their accessibility ID. For this reason, to make it clear exactly what your test code is doing, I recommend only using the 'id' strategy for Android.
 
+In the last slide, you may have noticed that all the locator strategies started with the word MobileBy. This is the Appium equivalent of Selenium's By class. We use it just the same way as we do the By class, in order to find the locator strategies that Appium supports. You can see on this slide how we import it, from the package appium.webdriver.common.mobileby. Appium keeps all the original Selenium strategies on the MobileBy class as well so you can safely import it alone even if you're writing web tests too.
+
+OK, now let's pause for a moment to consider XPath, and why we might want to avoid using it, or at least, use it wisely.
+
+We already mentioned in connection with finding elements for web that using XPath could encourage the use of unstable selectors. That also applies to Appium. Using path-based selectors can lead to brittle test code, which breaks unexpectedly just because random little things changed in the UI structure.
+
+For Appium, there's another set of reasons not to use XPath. The first is that XPath selectors are not cross-platform, usually. It is difficult to write a single XPath query that will work on both iOS and Android, since the element class names and attributes differ so greatly.
+
+Furthermore, XPath in Appium can be quite costly in terms of test performance. This is because there is no native XML or XPath search functionality for iOS or Android. To support XPath, Appium has to first serialize an XML document from the set of available elements, which means recursively finding and looking at every element on screen. Then, it has to perform the XPath query itself (which is pretty fast). Then, it has to take any matching nodes and connect them back up with actual UI elements, which were never part of the XML document. In other words, Appium has to do a lot of extra work to make your XPath query match mobile elements, and in some cases, especially depending on how many elements are on screen, this can take a very long time.
+
+All that being said, there are some cases where it's OK to use XPath, as long as we do it wisely. What does it look like to use XPath wisely?
+
+First, it looks like using it as a last resort. It's definitely better to use one of the ID strategies if possible, since those will be much faster and easier to maintain.
+
+Second, it looks like making sure your selectors aren't brittle by ensuring they are keyed to unique element properties. So something like //element[@prop='unique_value'] instead of //element/element/element. This is where a deep knowledge of XPath helps, because there is often a way to intelligently refer to an element using unique information about it, or its parents, children, or siblings.
+
+Third, it looks like doing extensive performance testing of your query to make sure it's not slowing down your test too much. If you have a "normal" app without too many elements on screen, XPath is going to be fine. But it's always important to test this before you add a bunch of queries to your testsuite. You might even find that as your app grows and elements are added, existing queries might slow down.
+
+Alright, let's look at a quick set of examples. It's basically exactly the same as for Selenium, just that we are using mobile locator strategies. For the find_element call we are using MobileBy.ACCESSIBILITY_ID, and for the find_elements call we are using MobileBy.ID.
+
+...
+
+
+
+
+
 
