@@ -41,7 +41,7 @@ Just like with web elements, finding mobile elements is a combination of locator
 
 You may have noticed that all the locator strategies started with the word <code>MobileBy</code>. This is the Appium equivalent of Selenium's <code>By</code> class. We use it just the same way as we do the By class, in order to find the locator strategies that Appium supports. We import it, from the package <code>appium.webdriver.common.mobileby</code>. Appium keeps all the original Selenium strategies on the <code>MobileBy</code> class as well so you can safely import it alone even if you're writing web tests too.
 
-### Why Not to Use XPath
+### [Why Not to Use XPath](https://github.com/lana-20/appium-xpath)
 
 Why Not to Use XPath |
 ---- |
