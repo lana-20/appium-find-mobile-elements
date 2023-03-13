@@ -40,6 +40,63 @@ Third, it looks like doing extensive performance testing of your query to make s
 
 Alright, let's look at a quick set of examples. It's basically exactly the same as for Selenium, just that we are using mobile locator strategies. For the find_element call we are using MobileBy.ACCESSIBILITY_ID, and for the find_elements call we are using MobileBy.ID.
 
+Now seems like a good time to put this into practice! So let's head on over to our editor. Alright. Let's work up an example of finding elements on iOS. I'm going to create a new file called [<code>find_ios.py</code>](https://github.com/lana-20/appium-find-mobile-elements/blob/main/find_ios.py):
+
+    from os import path
+    from appium import webdriver
+    from appium.webdriver.common.mobileby import MobileBy
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+
+    CUR_DIR = path.dirname(path.abspath(__file__))
+    APP = path.join(CUR_DIR, 'TheApp.app.zip')
+    APPIUM = 'http://localhost:4723'
+    CAPS = {
+        'platformName': 'iOS',
+        'platformVersion': '16.2',
+        'deviceName': 'iPhone 14 Pro',
+        'automationName': 'XCUITest',
+        'app': APP,
+    }
+
+    driver = webdriver.Remote(APPIUM, CAPS)
+    try:
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located(
+            (MobileBy.ACCESSIBILITY_ID, 'Login Screen')))
+        driver.find_element(MobileBy.CLASS_NAME, 'XCUIElementTypeStaticText')
+        driver.find_element(MobileBy.XPATH, '//XCUIElementTypeOther[@label="Webview Demo"]')
+    finally:
+        driver.quit()
+
+The first thing we do in this script is import our wait and expected conditions modules, since we're going to use them with Appium just like we did with Selenium. We'll also want our <code>MobileBy</code> class so we can use it to get the locator strategies we'll use.
+
+    from appium.webdriver.common.mobileby import MobileBy
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+
+I put the <code>driver.quit</code> line into a <code>finally</code> block to recognize that all our actual driver usage is going to go inside some exception handling:
+
+    driver = webdriver.Remote(APPIUM, CAPS)
+    try:
+    finally:
+        driver.quit()
+
+Now it's time to find an element. But as we know, it's a good practice not to just find an element right off the bat, because we know that an app could take some time to load its elements. Thus we want to use a WebDriverWait! All of this will go inside the <code>try</code> block:
+
+    wait = WebDriverWait(driver, 10)
+
+Now that we have a wait, we can use it to wait for an element. I'm going to try to find an element by Accessibility ID. In this case I'm going to try to find the 'Login Screen' element, which is basically a list item that when tapped will take us to the Login Screen. So I will use <code>MobileBy.ACCESSIBILITY_ID</code>:
+
+    wait.until(EC.presence_of_element_located(
+            (MobileBy.ACCESSIBILITY_ID, 'Login Screen')))
+
+I'm not actually doing anything with the element in this script, which is why I'm not assigning anything with the return value of <code>wait.until</code>. At this point in the script, if this line doesn't raise an exception, we will know that we've found this Login Screen element.
+
+Let's not stop here! Let's try to find a few more elements as well. Now that I'm on the screen, I don't need to wait anymore because I know that if we've found the Login Screen element, all the others on this screen will be loaded as well. So let's try and find an element by its type, in other words, by its class name.
+
+    driver.find_element(MobileBy.CLASS_NAME, 'XCUIElementTypeStaticText')
+
 ...
 
 
