@@ -73,7 +73,12 @@ All that being said, there are some cases where it's OK to use XPath, as long as
 
 3. Third, it looks like doing extensive performance testing of your query to make sure it's not slowing down your test too much. If you have a "normal" app without too many elements on screen, XPath is going to be fine. But it's always important to test this before you add a bunch of queries to your testsuite. You might even find that as your app grows and elements are added, existing queries might slow down.
 
-Alright, let's look at a quick set of examples. It's basically exactly the same as for Selenium, just that we are using mobile locator strategies. For the <code>find_element</code> call we are using <code>MobileBy.ACCESSIBILITY_ID</code>, and for the <code>find_elements</code> call we are using <code>MobileBy.ID</code>.
+### <code>driver.find_element()</code> & <code>driver.find_elements()</code>
+
+Alright, let's look at a quick set of examples. It's basically exactly the same as for Selenium, just that we are using mobile locator strategies. For the <code>find_element</code> call we are using <code>MobileBy.ACCESSIBILITY_ID</code>, and for the <code>find_element**s**</code> call we are using <code>MobileBy.ID</code>.
+
+    el = driver.find_element(MobileBy.ACCESSIBILITY_ID, 'username')
+    els = driver.find_elements(MobileBy.ID, 'password')
 
 ### Practical Example
 
