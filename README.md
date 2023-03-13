@@ -97,10 +97,63 @@ Let's not stop here! Let's try to find a few more elements as well. Now that I'm
 
     driver.find_element(MobileBy.CLASS_NAME, 'XCUIElementTypeStaticText')
 
-...
+Here I'm just using <code>find_element</code>, and the type of element I'm finding is an <code>XCUIElementTypeStaticText</code>. This is iOS's verbose way of denoting the class name of a static text field, i.e., a simple text label. Let's do one more too.
 
+    driver.find_element(MobileBy.XPATH, '//XCUIElementTypeOther[@label="Webview Demo"]')
 
+This time I'm using XPath, to try and find an element which has the label of "Webview Demo". I'll save this file, then head over to my terminal to execute it with the <code>python</code> or <code>python**3**</code> command. As always, I need to ensure that I have an Appium server running, and it helps also to make sure I have the appropriate simulator already launched, though it's not necessary. 
 
+All we see as this executes is that the app pops open and then almost immediately closes again. As long as there was nothing printed out to my terminal, that's great. That's what we want. It means all the elements were found correctly.
 
+Let's head back to the editor and do the same thing for Android in the [<code>find_android.py</code>](https://github.com/lana-20/appium-find-mobile-elements/blob/main/find_android.py) file:
+
+    from os import path
+    from appium import webdriver
+    from appium.webdriver.common.mobileby import MobileBy
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+
+    CUR_DIR = path.dirname(path.abspath(__file__))
+    APP = path.join(CUR_DIR, 'TheApp-v1.10.0.apk')
+    APPIUM = 'http://localhost:4723'
+    CAPS = {
+        'platformName': 'Android',
+        'platformVersion': '13.2',
+        'deviceName': 'Android Emulator',
+        'automationName': 'UiAutomator2',
+        'app': APP,
+    }
+
+    driver = webdriver.Remote(APPIUM, CAPS)
+    try:
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located(
+            (MobileBy.ACCESSIBILITY_ID, 'Login Screen')))
+        driver.find_element(MobileBy.CLASS_NAME, 'android.widget.TextView')
+        driver.find_element(MobileBy.XPATH, '//android.widget.TextView[@text="Webview Demo"]')
+    finally:
+        driver.quit()
+       
+What do we need to change to make this work on Android? We need some of the Android-specific constants, like the APP and the CAPS constants. The first find command, wrapped up in the WebDriverWait, is the same for both iOS and Android. That's because it's using the Accessibility ID locator strategy, and I know that the developer put the same accessibility ID on both versions of the app. 
+
+The next wait command differs for platforms. Since Android doesn't know anything about <code>XCUIElementType</code> stuff, we change it to omething Android does know about, namely elements of type <code>android.widget.TextView</code>:
+
+    driver.find_element(MobileBy.CLASS_NAME, 'android.widget.TextView')
+
+There are definitely some of these types of views on the page, so that should work. And now, let's use the proper XPath find command as well, since again, the iOS XPath query will not find anything in our Android view hierarchy. Let's try to find the equivalent element using Android node types and attribute names.
+
+    driver.find_element(MobileBy.XPATH, '//android.widget.TextView[@text="Webview Demo"]')
+
+In this case I use the node type <code>android.widget.TextView</code> and attribute <code>text</code>. I know how to do this because I've been able to actually look at the XML source output of the app at this point. You could also try this out by printing the result of the <code>driver.page_source</code> command. Back in the terminal, I run:
+
+    python find_android.py
+
+Or, on macOS
+
+    python3 find_android.py
+
+And since I have a running Appium server and a running emulator, this script will start to run. I'll go over here to the emulator to wait and see my app pop open and then close again. And like before, if there's no output on the command line where I ran my Python script, then that means things worked successfully, and all the elements were able to be found. If you ran into an error and suspect your emulator might be running a bit slow, then you can always bump up the timeout in the WebDriverWait to see if that helps.
+
+Alright, so this is how we use the Appium-specific locator strategies to find elements in our mobile apps! You can already see that dealing with element selectors on multiple platforms can be a bit interesting, if we're not able to use the Accessibility ID strategy.
 
 
